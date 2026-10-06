@@ -19,6 +19,8 @@ SampleDataAccessApi
 v
 Azure SQL Database
 
+```
+
 ## Components
 
 ### SampleAppApi
