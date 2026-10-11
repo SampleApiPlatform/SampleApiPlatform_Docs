@@ -1,42 +1,203 @@
 # SampleApiPlatform
 
-A cloud-native distributed application platform built with ASP.NET Core and Microsoft Azure.
+A cloud-native microservices platform built with ASP.NET Core and Microsoft Azure.
 
-This project demonstrates the design, implementation, deployment, and operation of a modern microservices-based application using Azure-native services, secure authentication, service-to-service communication, and automated CI/CD pipelines.
+This project demonstrates the design, implementation, deployment, security, and operation of a distributed application hosted on Azure Container Apps. The platform showcases modern cloud-native development practices including Microsoft Entra ID authentication, Dapr service invocation, Azure SQL integration, Managed Identity, Azure Key Vault, and automated CI/CD pipelines.
 
-## Architecture
+---
+
+# Project Highlights
+
+✅ Developed a distributed microservices platform on Microsoft Azure
+
+✅ Implemented Microsoft Entra ID authentication using OAuth 2.0, OpenID Connect, and JWT Bearer tokens
+
+✅ Secured Azure SQL database access using Managed Identity
+
+✅ Implemented service-to-service communication using Dapr Service Invocation
+
+✅ Integrated Azure Key Vault for secure secret management
+
+✅ Automated build, test, deployment, and database migrations using Azure DevOps
+
+✅ Containerized services using Docker and hosted them in Azure Container Apps
+
+✅ Designed and deployed a secure end-to-end cloud-native architecture
+
+---
+
+# Solution Architecture
 
 ```text
-Client
-|
-v
-SampleAppApi
-|
-| Dapr Service Invocation
-v
-SampleDataAccessApi
-|
-v
-Azure SQL Database
-
+                 ┌─────────────────────┐
+                 │  Client Application │
+                 │ (Angular / Browser) │
+                 └──────────┬──────────┘
+                            │
+                            │ OAuth 2.0 / OpenID Connect
+                            ▼
+                   Microsoft Entra ID
+                            │
+                            │ JWT Access Token
+                            ▼
+                    ┌───────────────┐
+                    │ SampleAppApi  │
+                    │  Public API   │
+                    └───────┬───────┘
+                            │
+                            │ Dapr Service Invocation
+                            ▼
+                  ┌───────────────────┐
+                  │SampleDataAccessApi│
+                  │  Internal API     │
+                  └─────────┬─────────┘
+                            │
+                            ▼
+                    Azure SQL Database
 ```
 
-## Components
+---
 
-### SampleAppApi
-The primary API service responsible for handling client requests, business logic, authentication, and communication with backend services.
+# Architecture Decisions
 
-**Technologies:**
-- ASP.NET Core
+The platform intentionally uses a microservices architecture to demonstrate modern cloud-native engineering practices.
+
+### Authentication Boundary
+
+Authentication and authorization are enforced at the SampleAppApi boundary using Microsoft Entra ID.
+
+Protected endpoints require:
+
+```http
+Authorization: Bearer <JWT>
+```
+
+Authenticated users must possess the required API scope:
+
+```text
+access_as_user
+```
+
+### Internal Service Communication
+
+The SampleDataAccessApi is designed as an internal service and communicates with SampleAppApi through Dapr Service Invocation.
+
+Benefits:
+
+- Service discovery
+- Retry capabilities
+- Resiliency
+- Reduced infrastructure coupling
+- Simplified service communication
+
+### Database Security
+
+Azure SQL authentication is implemented using Managed Identity.
+
+Benefits:
+
+- No passwords
+- No embedded credentials
+- No database secrets in source control
+- Passwordless Azure authentication
+
+### Secret Management
+
+Platform secrets are stored securely in Azure Key Vault and retrieved at runtime.
+
+---
+
+# Key Features
+
+## Authentication & Authorization
+
+- Microsoft Entra ID integration
+- OAuth 2.0
+- OpenID Connect
+- JWT Bearer Authentication
+- Scope-based authorization
+- Protected REST endpoints
+- User identity validation
+
+## Cloud Security
+
+- Azure Key Vault
+- Managed Identity
+- Secret management
+- Secure configuration
+- Environment-based settings
+
+## Service-to-Service Communication
+
 - Dapr Service Invocation
+- Service discovery
+- Retry mechanisms
+- Internal API communication
+
+## Data Layer
+
+- Azure SQL Database
+- Entity Framework Core
+- Repository Pattern
+- Service Pattern
+
+## Platform & Hosting
+
+- Azure Container Apps
+- Docker
+- Azure Monitor
+- Log Analytics
+
+## DevOps
+
+- Azure DevOps Pipelines
+- Continuous Integration
+- Continuous Deployment
+- Automated Testing
+- Entity Framework Migrations
+
+---
+
+# Components
+
+## SampleAppApi
+
+The public entry point of the platform.
+
+### Responsibilities
+
+- User authentication
+- User authorization
+- JWT validation
+- Business logic execution
+- Service orchestration
+- Dapr communication
+
+### Technologies
+
+- ASP.NET Core
+- Microsoft Identity Web
 - JWT Authentication
+- Dapr
+- Azure Key Vault
 - Docker
 - Azure Container Apps
 
-### SampleDataAccessApi
-A dedicated data access service responsible for interacting with Azure SQL Database.
+---
 
-**Technologies:**
+## SampleDataAccessApi
+
+Internal service responsible for data access.
+
+### Responsibilities
+
+- Azure SQL interaction
+- CRUD operations
+- Entity Framework Core operations
+- Database abstraction
+
+### Technologies
+
 - ASP.NET Core
 - Entity Framework Core
 - Azure SQL Database
@@ -44,66 +205,134 @@ A dedicated data access service responsible for interacting with Azure SQL Datab
 - Docker
 - Azure Container Apps
 
-### SampleSharedModels
-Shared contracts and DTO models used by multiple services to ensure consistent communication.
+---
 
-## Cloud Platform
+## SampleSharedModels
 
-The platform is deployed to Microsoft Azure using:
+Shared NuGet package used by both services.
 
+Contains:
+
+- DTOs
+- Interfaces
+- Shared contracts
+- Common models
+
+This package ensures consistent communication between services.
+
+---
+
+# Azure Services Used
+
+- Microsoft Entra ID
 - Azure Container Apps
 - Azure SQL Database
-- Azure Container Registry
 - Azure Key Vault
-- Managed Identities
-- Dapr
 - Azure Monitor
-- Azure DevOps Pipelines
+- Azure Log Analytics
+- Managed Identity
+- Azure DevOps
+- Dapr
 
-## Security
+---
 
-The platform demonstrates several security practices:
+# Authentication Flow
 
-- JWT-based authentication
-- Service-to-service authentication
-- Managed Identity integration
-- Secret management using Azure Key Vault
-- Environment-based configuration
+```text
+User
+ │
+ ▼
+Microsoft Entra ID
+ │
+ │ JWT Access Token
+ ▼
+SampleAppApi
+ │
+ │ Token Validation
+ ▼
+Business Logic
+ │
+ │ Dapr Service Invocation
+ ▼
+SampleDataAccessApi
+ │
+ ▼
+Azure SQL Database
+```
 
-## CI/CD
+The API validates:
 
-Deployment is automated using Azure DevOps pipelines.
+- Token signature
+- Audience
+- Tenant
+- Expiration
+- Scope (`access_as_user`)
 
-**Features include:**
-- Automated builds
-- Container image creation
-- Azure Container Registry integration
-- Automated deployments
-- Revision-based deployments in Azure Container Apps
+Only authenticated users can access protected endpoints.
 
-## Challenges Solved
+---
 
-During development several cloud-native engineering challenges were addressed:
+# CI/CD Pipeline
 
-- Container startup failures
-- Azure Container Apps revision management
+Azure DevOps pipelines automate the complete deployment process.
+
+Pipeline responsibilities:
+
+1. Restore dependencies
+2. Build solution
+3. Execute unit tests
+4. Generate code coverage
+5. Execute Entity Framework migrations
+6. Build Docker images
+7. Push container images
+8. Deploy new Azure Container App revisions
+
+---
+
+# Challenges Solved
+
+During the development of this platform I gained practical experience with:
+
+- Azure Container Apps deployment and troubleshooting
+- Microsoft Entra ID integration
+- OAuth 2.0 and OpenID Connect flows
+- JWT token validation and authorization policies
+- Azure Key Vault integration
+- Managed Identity configuration
+- Azure SQL authentication
 - Dapr service discovery and invocation
-- Secure database connectivity
-- Managed Identity authentication
 - Secret management
-- CI/CD troubleshooting
+- CI/CD automation
 - Distributed system debugging
 
-## Documentation
+---
 
-Detailed documentation is available in the `docs/` folder:
+# Skills Demonstrated
 
-- [Container.pdf](docs/Container.pdf) – Deployment and Container Guide
+- C#
+- ASP.NET Core
+- REST APIs
+- Entity Framework Core
+- Azure Container Apps
+- Azure SQL Database
+- Microsoft Entra ID
+- OAuth 2.0
+- OpenID Connect
+- JWT Authentication
+- Azure Key Vault
+- Managed Identity
+- Dapr
+- Docker
+- Azure DevOps
+- CI/CD Pipelines
+- Cloud Security
+- Distributed Systems
+- Microservices Architecture
 
-## Skills Demonstrated
+---
 
-`C#` `ASP.NET Core` `REST APIs` `Entity Framework Core` `Azure` `Docker` `Dapr` `Azure SQL Database` `Azure DevOps` `CI/CD` `Cloud Security` `Microservices Architecture`
+# Purpose
 
-## Purpose
+SampleApiPlatform was created as a professional portfolio project to demonstrate practical experience designing, building, securing, deploying, and operating cloud-native applications on Microsoft Azure.
 
-This project was created as a professional portfolio project to demonstrate practical experience in designing, developing, deploying, and operating cloud-native applications on Microsoft Azure.
+The project combines modern enterprise technologies including Microsoft Entra ID, Azure Container Apps, Dapr, Azure SQL, Managed Identity, Azure Key Vault, and Azure DevOps to showcase real-world cloud architecture and software engineering practices.
