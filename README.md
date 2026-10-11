@@ -26,6 +26,16 @@ This project demonstrates the design, implementation, deployment, security, and 
 
 ---
 
+---
+
+# Documentation
+
+Detailed implementation and deployment documentation is available in the project documentation:
+
+- [Container.pdf](docs/Container.pdf) – Azure architecture, Azure Container Apps, Dapr configuration, Managed Identity setup, Azure SQL integration, Microsoft Entra ID authentication, Azure Key Vault integration, CI/CD pipelines, and deployment walkthroughs.
+
+The documentation describes the complete journey from local development through containerization, deployment, authentication, security configuration, and production hosting in Azure.
+
 # Solution Architecture
 
 ```text
